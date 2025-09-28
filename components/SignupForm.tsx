@@ -2,14 +2,36 @@
 
 import { useState } from 'react';
 
-export default function SignupForm() {
+interface SignupFormProps {
+  onSuccess?: () => void;
+}
+
+export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log({ email, password });
+
+    const response = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Signup successful:', data);
+      if (onSuccess) {
+        onSuccess();
+      }
+    } else {
+      console.error('Signup failed:', data.error);
+      // TODO: Show error message to the user
+    }
   };
 
   return (

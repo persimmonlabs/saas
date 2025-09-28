@@ -2,14 +2,36 @@
 
 import { useState } from 'react';
 
-export default function LoginForm() {
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log({ email, password });
+
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Login successful:', data);
+      if (onSuccess) {
+        onSuccess();
+      }
+    } else {
+      console.error('Login failed:', data.error);
+      // TODO: Show error message to the user
+    }
   };
 
   return (
