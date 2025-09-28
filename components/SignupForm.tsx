@@ -10,10 +10,12 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null); // Clear previous errors
+    setSuccessMessage(null); // Clear previous success messages
 
     const response = await fetch('/api/auth/signup', {
       method: 'POST',
@@ -26,9 +28,13 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
     const data = await response.json();
 
     if (response.ok) {
+      setSuccessMessage('Signup successful!');
       console.log('Signup successful:', data);
       if (onSuccess) {
-        onSuccess();
+        // Delay redirection slightly to allow user to see success message
+        setTimeout(() => {
+          onSuccess();
+        }, 1500); // 1.5 second delay
       }
     } else {
       setError(data.error || 'Signup failed');
@@ -39,6 +45,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
   return (
     <form onSubmit={handleSignup}>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
       <input
         type="email"
         placeholder="Email"
