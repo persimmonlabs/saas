@@ -9,9 +9,11 @@ interface SignupFormProps {
 export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
 
     const response = await fetch('/api/auth/signup', {
       method: 'POST',
@@ -29,13 +31,14 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
         onSuccess();
       }
     } else {
+      setError(data.error || 'Signup failed');
       console.error('Signup failed:', data.error);
-      // TODO: Show error message to the user
     }
   };
 
   return (
     <form onSubmit={handleSignup}>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
         type="email"
         placeholder="Email"

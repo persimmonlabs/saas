@@ -9,9 +9,11 @@ interface LoginFormProps {
 export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
 
     const response = await fetch('/api/auth/login', {
       method: 'POST',
@@ -29,13 +31,14 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         onSuccess();
       }
     } else {
+      setError(data.error || 'Login failed');
       console.error('Login failed:', data.error);
-      // TODO: Show error message to the user
     }
   };
 
   return (
     <form onSubmit={handleLogin}>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <input
         type="email"
         placeholder="Email"
